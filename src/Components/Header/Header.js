@@ -1,13 +1,24 @@
-import React from 'react';
-
+import React, { useContext } from 'react';
+import { useHistory } from 'react-router-dom';
 import './Header.css';
 import OlxLogo from '../../assets/OlxLogo';
 import Search from '../../assets/Search';
 import Arrow from '../../assets/Arrow';
 import SellButton from '../../assets/SellButton';
 import SellButtonPlus from '../../assets/SellButtonPlus';
+import { AuthContext, FirebaseContext } from '../../store/Context';
+import { Route, Router,Switch} from 'react-router-dom';
+import SellPage from '../../Pages/Create';
+
 function Header() {
+  const history = useHistory();
+
+  
+  const {user} = useContext(AuthContext)
+  const {firebase} = useContext(FirebaseContext)
   return (
+    <Router>
+      <Switch>
     <div className="headerParentDiv">
       <div className="headerChildDiv">
         <div className="brandName">
@@ -34,19 +45,24 @@ function Header() {
           <Arrow></Arrow>
         </div>
         <div className="loginPage">
-          <span>Login</span>
+          <span>{user ? user.displayName : 'Login'}</span>
           <hr />
         </div>
-
+        {user && <span onClick={()=>{
+          firebase.auth().signOut();
+          history.push('/login')
+        }}>Logout</span>}
         <div className="sellMenu">
           <SellButton></SellButton>
           <div className="sellMenuContent">
             <SellButtonPlus></SellButtonPlus>
-            <span>SELL</span>
+            <Route path ="/sell" component={SellPage}/>
           </div>
         </div>
       </div>
     </div>
+    </Switch>
+    </Router>
   );
 }
 
