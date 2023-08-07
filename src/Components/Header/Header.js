@@ -1,5 +1,5 @@
-import React, { useContext } from 'react';
-import { useHistory } from 'react-router-dom';
+import React ,{useContext}from 'react';
+import {useHistory} from 'react-router-dom'
 import './Header.css';
 import OlxLogo from '../../assets/OlxLogo';
 import Search from '../../assets/Search';
@@ -7,21 +7,27 @@ import Arrow from '../../assets/Arrow';
 import SellButton from '../../assets/SellButton';
 import SellButtonPlus from '../../assets/SellButtonPlus';
 import { AuthContext, FirebaseContext } from '../../store/Context';
-import { Route, Router,Switch} from 'react-router-dom';
-import SellPage from '../../Pages/Create';
+
 
 function Header() {
-  const history = useHistory();
+  const history=useHistory();
+  const {user}= useContext(AuthContext)
+  const {Firebase} = useContext(FirebaseContext)
+  const handleLogin=()=>{
+    user ? history.push('/') : history.push('/login')
+  }
 
-  
-  const {user} = useContext(AuthContext)
-  const {firebase} = useContext(FirebaseContext)
+  const handleSell=()=>{
+    user? history.push('/create') : history.push('/login')
+  }
+
+  const handleLogo=()=>{
+    history.push('/')
+  }
   return (
-    <Router>
-      <Switch>
     <div className="headerParentDiv">
       <div className="headerChildDiv">
-        <div className="brandName">
+        <div className="brandName" onClick={handleLogo}>
           <OlxLogo></OlxLogo>
         </div>
         <div className="placeSearch">
@@ -45,24 +51,25 @@ function Header() {
           <Arrow></Arrow>
         </div>
         <div className="loginPage">
-          <span>{user ? user.displayName : 'Login'}</span>
+          <span className='log' onClick={handleLogin}>{user? `Welcome ${user.displayName} `: 'Login'}</span>
           <hr />
+          
         </div>
-        {user && <span onClick={()=>{
-          firebase.auth().signOut();
-          history.push('/login')
-        }}>Logout</span>}
+        {user && <span className='log' onClick={()=>{
+          Firebase.auth().signOut().then(()=>{
+            history.push('/login')
+          })
+        }}>
+          Logout</span>}
         <div className="sellMenu">
           <SellButton></SellButton>
           <div className="sellMenuContent">
             <SellButtonPlus></SellButtonPlus>
-            <Route path ="/sell" component={SellPage}/>
+            <span onClick={handleSell}>SELL</span>
           </div>
         </div>
       </div>
     </div>
-    </Switch>
-    </Router>
   );
 }
 
